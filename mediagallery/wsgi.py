@@ -10,4 +10,5 @@ application = get_wsgi_application()
 
 try:
     application = WhiteNoise(application)
-    application.add_files(str(MEDIA_ROOT), prefix='media/')
+except Exception as e:
+    print(f"WhiteNoise warning: {e}")
