@@ -1,0 +1,102 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Overview — JIYA &amp; Shailesh{% endblock %}
+{% block nav_home %}active{% endblock %}
+{% block topbar_title %}Baby Shower Overview{% endblock %}
+
+{% block dash_content %}
+<div class="dash-page">
+
+  <!-- Stats row -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">◈</div>
+      <div class="stat-info">
+        <span class="stat-num">{{ sections.count }}</span>
+        <span class="stat-label">Sections</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🖼</div>
+      <div class="stat-info">
+        <span class="stat-num">{{ total_images }}</span>
+        <span class="stat-label">Photos</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎬</div>
+      <div class="stat-info">
+        <span class="stat-num">{{ total_videos }}</span>
+        <span class="stat-label">Videos</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-info">
+        <span class="stat-num">{{ total_media }}</span>
+        <span class="stat-label">Total Media</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="dash-section-header">
+    <h2>Quick Actions</h2>
+  </div>
+  <div class="quick-actions">
+    <a href="{% url 'section_create' %}" class="quick-card">
+      <span class="quick-icon">+</span>
+      <span>New Section</span>
+    </a>
+    <a href="{% url 'dashboard_sections' %}" class="quick-card">
+      <span class="quick-icon">⇅</span>
+      <span>Reorder Sections</span>
+    </a>
+    <a href="{% url 'home' %}" target="_blank" class="quick-card">
+      <span class="quick-icon">↗</span>
+      <span>View Site</span>
+    </a>
+  </div>
+
+  <!-- Sections overview -->
+  <div class="dash-section-header">
+    <h2>All Sections</h2>
+    <a href="{% url 'section_create' %}" class="btn-primary-sm">+ New</a>
+  </div>
+
+  {% if sections %}
+  <div class="sections-table-wrap">
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Name</th>
+          <th>Photos</th>
+          <th>Videos</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sections %}
+        <tr>
+          <td><span class="order-badge">{{ s.order }}</span></td>
+          <td><strong>{{ s.name }}</strong></td>
+          <td>{{ s.image_count }}</td>
+          <td>{{ s.video_count }}</td>
+          <td class="actions-cell">
+            <a href="{% url 'media_upload' s.pk %}" class="action-btn">Upload</a>
+            <a href="{% url 'section_edit' s.pk %}" class="action-btn">Edit</a>
+            <a href="{% url 'section_detail' s.pk %}" target="_blank" class="action-btn">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state-dash">
+    <p>No sections yet. <a href="{% url 'section_create' %}">Create your first section →</a></p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

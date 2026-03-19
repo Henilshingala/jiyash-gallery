@@ -1,0 +1,62 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}{{ action }} Section — Dashboard{% endblock %}
+{% block nav_sections %}active{% endblock %}
+{% block topbar_title %}{{ action }} Section{% endblock %}
+
+{% block dash_content %}
+<div class="dash-page">
+  <div class="dash-section-header">
+    <div>
+      <h2>{{ action }} Section</h2>
+      <p class="dash-sub">{% if action == 'Edit' %}Update section details and cover image.{% else %}Create a new gallery section.{% endif %}</p>
+    </div>
+    <a href="{% url 'dashboard_sections' %}" class="btn-outline-sm">← Back</a>
+  </div>
+
+  <div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Section Name *</label>
+          {{ form.name }}
+          {% if form.name.errors %}<span class="form-error">{{ form.name.errors.0 }}</span>{% endif %}
+        </div>
+        <div class="form-group">
+          <label>Order Number *</label>
+          {{ form.order }}
+          <span class="form-hint">Lower number = appears first on the site.</span>
+          {% if form.order.errors %}<span class="form-error">{{ form.order.errors.0 }}</span>{% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        {{ form.description }}
+        {% if form.description.errors %}<span class="form-error">{{ form.description.errors.0 }}</span>{% endif %}
+      </div>
+
+      <div class="form-group">
+        <label>Cover Image</label>
+        {% if section and section.cover_image %}
+        <div class="current-cover">
+          <img src="{{ section.cover_image.url }}" alt="Current cover">
+          <span>Current cover — upload a new one to replace</span>
+        </div>
+        {% endif %}
+        {{ form.cover_image }}
+        <span class="form-hint">Optional. If not set, the first photo in the section is used.</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">{{ action }} Section</button>
+        <a href="{% url 'dashboard_sections' %}" class="btn-ghost">Cancel</a>
+        {% if action == 'Edit' and section %}
+        <a href="{% url 'media_upload' section.pk %}" class="btn-ghost">Manage Media →</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>500 — Server Error · Luminary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="error-page">
+  <div class="error-bg"><div class="hero-grain"></div><div class="hero-orb hero-orb-2"></div></div>
+  <div class="error-content">
+    <div class="error-code">500</div>
+    <h1 class="error-title">Something went wrong</h1>
+    <p class="error-sub">A server error occurred. Please try again in a moment.</p>
+    <a href="/" class="btn-primary">← Return to Gallery</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,323 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Upload to {{ section.name }} — Dashboard{% endblock %}
+{% block nav_sections %}active{% endblock %}
+{% block topbar_title %}Upload Media{% endblock %}
+
+{% block dash_content %}
+<div class="dash-page">
+
+  <div class="dash-section-header">
+    <div>
+      <h2>{{ section.name }}</h2>
+      <p class="dash-sub">{{ section.media_count }} items · Upload images (JPG, PNG, WEBP) or videos (MP4, MOV)</p>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'section_edit' section.pk %}" class="btn-outline-sm">Edit Section</a>
+      <a href="{% url 'dashboard_sections' %}" class="btn-outline-sm">← Sections</a>
+    </div>
+  </div>
+
+  <!-- Upload Drop Zone -->
+  <div class="form-card upload-card">
+    <form method="post" enctype="multipart/form-data" id="uploadForm">
+      {% csrf_token %}
+
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <p class="drop-title">Drag & drop files here</p>
+        <p class="drop-sub">or click to browse</p>
+        <input type="file" name="files" id="fileInput" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" class="drop-input">
+      </div>
+
+      <div id="filePreview" class="file-preview-grid"></div>
+
+      <div class="form-group" style="margin-top:1.5rem">
+        <label>Caption (applied to all uploaded files)</label>
+        <input type="text" name="caption" class="form-control" placeholder="Optional caption…">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" id="uploadBtn">Upload Files</button>
+        <span id="uploadCount" class="upload-count-label"></span>
+      </div>
+    </form>
+  </div>
+
+  <!-- Uploaded Media Grid -->
+  <div class="dash-section-header" style="margin-top:2.5rem">
+    <h2>Media in this section <span class="count-badge">{{ section.media_count }}</span></h2>
+    <div class="header-actions">
+      <button class="btn-primary-sm" onclick="saveOrder()" id="saveOrderBtn">Save Order</button>
+    </div>
+  </div>
+  
+  {% if recent_media %}
+  <div class="reorder-info" style="margin-bottom:1.5rem">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Drag items to reorder, or edit their number, then click <strong>Save Order</strong>.
+  </div>
+  <div class="admin-media-grid" id="sortableGrid">
+    {% for item in recent_media %}
+    <div class="admin-media-card sortable-card" data-id="{{ item.pk }}" draggable="true">
+      <div class="drag-handle-grid">⠿</div>
+      <input type="number" class="order-input-grid" value="{% if item.order > 0 %}{{ item.order }}{% endif %}" placeholder="#" min="0" onchange="updateOrder({{ item.pk }}, this.value)">
+      <input type="checkbox" class="bulk-checkbox" value="{{ item.pk }}" onchange="toggleSelection()">
+      <div class="admin-media-thumb">
+        {% if item.media_type == 'image' %}
+          <img src="{{ item.file.url }}" alt="{{ item.caption }}" loading="lazy">
+          <div class="admin-media-type image-tag">IMG</div>
+        {% else %}
+          <video preload="metadata" muted>
+            <source src="{{ item.file.url }}" type="video/mp4">
+          </video>
+          <div class="admin-media-type video-tag">VID</div>
+        {% endif %}
+      </div>  
+      <div class="admin-media-info">
+        <p class="admin-caption">{{ item.caption|default:"No caption" }}</p>
+        <p class="admin-date">{{ item.uploaded_at|date:"d M Y, H:i" }}</p>
+      </div>
+      <div class="admin-media-actions">
+        {% if item.media_type == 'image' %}
+        <form method="post" action="{% url 'set_cover' section.pk item.pk %}" style="display:inline">
+          {% csrf_token %}
+          <button type="submit" class="action-btn action-cover" title="Set as cover">Cover</button>
+        </form>
+        {% endif %}
+        <a href="{% url 'media_edit' item.pk %}" class="action-btn">Edit</a>
+        <form method="post" action="{% url 'media_delete' item.pk %}" style="display:inline"
+              onsubmit="return confirm('Delete this media item?')">
+          {% csrf_token %}
+          <button type="submit" class="action-btn action-danger">✕</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty-state-dash">
+    <p>No media uploaded yet. Use the form above to get started.</p>
+  </div>
+  </div>
+  {% endif %}
+  
+  <div id="bulkActionBar" class="bulk-action-bar" style="display:none;">
+    <span class="bulk-count-text" id="bulkCount">0 selected</span>
+    <button class="btn-primary-sm action-danger" style="background:var(--danger); border:none;" onclick="bulkDelete()">Delete Selected</button>
+    <button class="btn-outline-sm" onclick="selectAll()">Select All</button>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const filePreview = document.getElementById('filePreview');
+const uploadCount = document.getElementById('uploadCount');
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('drag-active');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-active');
+  fileInput.files = e.dataTransfer.files;
+  showPreviews(e.dataTransfer.files);
+});
+
+fileInput.addEventListener('change', () => showPreviews(fileInput.files));
+
+function showPreviews(files) {
+  filePreview.innerHTML = '';
+  uploadCount.textContent = files.length + ' file(s) selected';
+  [...files].forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'preview-item';
+    if (f.type.startsWith('image/')) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      div.appendChild(img);
+    } else {
+      const icon = document.createElement('div');
+      icon.className = 'preview-video-icon';
+      icon.textContent = '🎬';
+      div.appendChild(icon);
+    }
+    const name = document.createElement('span');
+    name.textContent = f.name.length > 16 ? f.name.slice(0, 14) + '…' : f.name;
+    div.appendChild(name);
+    filePreview.appendChild(div);
+  });
+}
+  </script>
+  
+  <style>
+  .drag-handle-grid {
+    position: absolute; top: 0.5rem; left: 0.5rem; z-index: 10;
+    background: rgba(0,0,0,0.6); color: #fff; width: 28px; height: 28px;
+    border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    cursor: grab; font-size: 14px;
+  }
+  .order-input-grid {
+    position: absolute; top: 0.5rem; left: 2.75rem; z-index: 10;
+    width: 45px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px; padding: 2px 4px; font-size: 12px; text-align: center;
+  }
+  .sortable-card { position: relative; transition: opacity 0.2s, transform 0.2s; }
+  .sortable-card.dragging { opacity: 0.5; transform: scale(0.95); }
+  .sortable-card.drag-over { border: 2px dashed var(--accent); }
+  </style>
+  
+  <script>
+  const REORDER_URL = "{% url 'media_reorder' %}";
+  const CSRF_TOKEN = "{{ csrf_token }}";
+  
+  let orderMap = {};
+  document.querySelectorAll('.sortable-card').forEach(card => {
+    let val = parseInt(card.querySelector('.order-input-grid').value);
+    orderMap[card.dataset.id] = isNaN(val) ? 0 : val;
+  });
+  
+  function updateOrder(id, val) {
+    let parsed = parseInt(val);
+    orderMap[id] = isNaN(parsed) ? 0 : parsed;
+  }
+  
+  async function saveOrder() {
+    const payload = Object.entries(orderMap).map(([id, order]) => ({ id: parseInt(id), order }));
+    const btn = document.getElementById('saveOrderBtn');
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+    
+    const res = await fetch(REORDER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
+      body: JSON.stringify(payload)
+    });
+    
+    if (res.ok) {
+      alert('Order saved successfully!');
+      location.reload();
+    } else {
+      alert('Error saving order.');
+      btn.textContent = 'Save Order';
+      btn.disabled = false;
+    }
+  }
+  
+  // Drag and drop grid functionality
+  let dragSrcEl = null;
+  document.querySelectorAll('.sortable-card').forEach(card => {
+    card.addEventListener('dragstart', e => {
+      dragSrcEl = card;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      rebuildOrderFromGrid();
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', () => {
+      card.classList.remove('drag-over');
+    });
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      if (dragSrcEl !== card) {
+        const grid = card.parentNode;
+        const cards = [...grid.children];
+        const srcIdx = cards.indexOf(dragSrcEl);
+        const dstIdx = cards.indexOf(card);
+        if (srcIdx < dstIdx) {
+          grid.insertBefore(dragSrcEl, card.nextSibling);
+        } else {
+          grid.insertBefore(dragSrcEl, card);
+        }
+        rebuildOrderFromGrid();
+      }
+    });
+  });
+  
+  function rebuildOrderFromGrid() {
+    // We only update internal map, but we don't overwrite the inputs 
+    // because the user wants to type them manually.
+    document.querySelectorAll('.sortable-card').forEach((card, i) => {
+      // Allow user to leave blank
+      const inp = card.querySelector('.order-input-grid');
+      let val = parseInt(inp.value);
+      if (isNaN(val)) val = 0;
+      orderMap[card.dataset.id] = val;
+    });
+  }
+  
+  // Bulk selection logic
+  const BULK_DELETE_URL = "{% url 'media_bulk_delete' %}";
+  let selectedIds = new Set();
+  
+  function toggleSelection() {
+    selectedIds = new Set();
+    document.querySelectorAll('.bulk-checkbox:checked').forEach(cb => {
+      selectedIds.add(parseInt(cb.value));
+    });
+    updateBulkActionBar();
+  }
+  
+  function selectAll() {
+    const checkboxes = document.querySelectorAll('.bulk-checkbox');
+    const allChecked = selectedIds.size === checkboxes.length;
+    checkboxes.forEach(cb => cb.checked = !allChecked);
+    toggleSelection();
+  }
+  
+  function updateBulkActionBar() {
+    const bar = document.getElementById('bulkActionBar');
+    const count = document.getElementById('bulkCount');
+    if (selectedIds.size > 0) {
+      count.textContent = selectedIds.size + ' selected';
+      bar.style.display = 'flex';
+      // tiny timeout to allow display:flex to apply before adding transition class
+      setTimeout(() => bar.classList.add('show'), 10);
+    } else {
+      bar.classList.remove('show');
+      setTimeout(() => bar.style.display = 'none', 300);
+    }
+  }
+  
+  async function bulkDelete() {
+    if (!confirm(`Are you sure you want to delete ${selectedIds.size} items?`)) return;
+    
+    // Disable button to prevent double clicks
+    const btn = document.querySelector('.bulk-action-bar .action-danger');
+    btn.textContent = 'Deleting...';
+    btn.disabled = true;
+    
+    const res = await fetch(BULK_DELETE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
+      body: JSON.stringify({ ids: Array.from(selectedIds) })
+    });
+    
+    if (res.ok) {
+        alert('Items deleted successfully!');
+        location.reload();
+    } else {
+        alert('Error deleting items.');
+        btn.textContent = 'Delete Selected';
+        btn.disabled = false;
+    }
+  }
+  </script>
+  {% endblock %}

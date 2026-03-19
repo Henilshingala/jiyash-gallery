@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>404 — Page Not Found · Luminary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="error-page">
+  <div class="error-bg"><div class="hero-grain"></div><div class="hero-orb hero-orb-1"></div></div>
+  <div class="error-content">
+    <div class="error-code">404</div>
+    <h1 class="error-title">This moment doesn't exist</h1>
+    <p class="error-sub">The page you're looking for has wandered off into the archive.</p>
+    <a href="/" class="btn-primary">← Return to Gallery</a>
+  </div>
+</div>
+</body>
+</html>

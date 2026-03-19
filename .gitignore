@@ -1,0 +1,29 @@
+# Python
+*.pyc
+__pycache__/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.pyo
+# We want to track the database for local-first workflow
+# *.sqlite3
+
+# Environment
+.env
+venv/
+
+# Static files
+staticfiles/
+
+# Media
+# We want to track media files for local-first workflow
+# media/
+
+# VS Code
+.vscode/
+
+# Large videos excluded (>100MB)
+media/uploads/IMG_5807.MP4
+media/uploads/Jiyas_baby-shower_welcome.mp4

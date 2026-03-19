@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login — Luminary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body class="login-body">
+
+<div class="login-wrap">
+  <div class="login-art">
+    <div class="login-art-orb"></div>
+    <div class="login-art-orb login-art-orb-2"></div>
+    <div class="hero-grain"></div>
+    <div class="login-art-text">
+      <span class="login-art-logo">◈</span>
+      <h2>Luminary</h2>
+      <p>Your personal gallery archive</p>
+    </div>
+  </div>
+
+  <div class="login-panel">
+    <div class="login-form-wrap">
+      <h1 class="login-title">Welcome back</h1>
+      <p class="login-sub">Sign in to manage your gallery</p>
+
+      {% if messages %}
+        {% for msg in messages %}
+        <div class="dash-alert dash-alert-error">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" class="login-form">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" class="form-control" placeholder="Enter username" required autofocus>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn-primary full-width">Sign In →</button>
+      </form>
+
+      <a href="{% url 'home' %}" class="login-back">← Back to gallery</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

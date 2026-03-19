@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}JIYA &amp; Shailesh{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="{% url 'home' %}" class="nav-logo">
+      <span class="logo-mark"></span>
+      <span class="logo-text">JIYA &amp; Shailesh</span>
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'home' %}">Gallery</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard_home' %}" class="btn-outline-sm">Dashboard</a>
+        <a href="{% url 'dashboard_logout' %}" class="btn-outline-sm">Logout</a>
+      {% else %}
+        <a href="{% url 'dashboard_login' %}" class="btn-outline-sm">Admin</a>
+      {% endif %}
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="{% url 'home' %}">Gallery</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard_home' %}">Dashboard</a>
+      <a href="{% url 'dashboard_logout' %}">Logout</a>
+    {% else %}
+      <a href="{% url 'dashboard_login' %}">Admin Login</a>
+    {% endif %}
+  </div>
+</nav>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="footer-logo">◈ Luminary</span>
+    <span class="footer-copy">Personal Gallery &amp; Media Archive</span>
+  </div>
+</footer>
+
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,38 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block title %}Edit Media — Dashboard{% endblock %}
+{% block topbar_title %}Edit Media{% endblock %}
+
+{% block dash_content %}
+<div class="dash-page">
+  <div class="dash-section-header">
+    <h2>Edit Media Item</h2>
+    <a href="{% url 'media_upload' item.section.pk %}" class="btn-outline-sm">← Back</a>
+  </div>
+
+  <div class="form-card" style="max-width:600px">
+    <div class="media-preview-edit">
+      {% if item.media_type == 'image' %}
+      <img src="{{ item.file.url }}" alt="{{ item.caption }}">
+      {% else %}
+      <video src="{{ item.file.url }}" controls style="width:100%;border-radius:8px"></video>
+      {% endif %}
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Caption</label>
+        {{ form.caption }}
+      </div>
+      <div class="form-group">
+        <label>Move to Section</label>
+        {{ form.section }}
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Save Changes</button>
+        <a href="{% url 'media_upload' item.section.pk %}" class="btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
