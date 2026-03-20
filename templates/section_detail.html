@@ -53,22 +53,22 @@
       {% for item in media_items %}
       <div class="media-item fade-in" style="--delay: {{ forloop.counter0 }}0ms"
            data-type="{{ item.media_type }}"
-           data-src="{{ item.file.url }}"
+           data-src="{{ item.get_url }}"
            data-caption="{{ item.caption }}"
            data-index="{{ forloop.counter0 }}">
 
         {% if item.media_type == 'image' %}
         <div class="media-thumb" onclick="openLightbox({{ forloop.counter0 }})">
-          <img src="{{ item.file.url }}" alt="{{ item.caption }}" loading="lazy">
+          <img src="{{ item.get_url }}" alt="{{ item.caption }}" loading="lazy">
           <div class="media-overlay">
             <span class="media-zoom">⊕</span>
             {% if item.caption %}<p class="media-caption-hover">{{ item.caption }}</p>{% endif %}
           </div>
-          <div class="media-download-btn" onclick="event.stopPropagation(); downloadMedia('{{ item.file.url }}', '{{ item.file.name|escapejs }}')" title="Download">
+          <div class="media-download-btn" onclick="event.stopPropagation(); downloadMedia('{{ item.get_url }}', '{{ item.file.name|escapejs }}')" title="Download">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </div>
           {% if item.caption %}
-          <div class="media-share-btn" onclick="event.stopPropagation(); copyLink('{{ request.scheme }}://{{ request.get_host }}{{ item.file.url }}')" title="Copy link">
+          <div class="media-share-btn" onclick="event.stopPropagation(); copyLink('{{ request.scheme }}://{{ request.get_host }}{{ item.get_url }}')" title="Copy link">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
           </div>
           {% endif %}
@@ -77,16 +77,16 @@
         {% else %}
         <div class="media-thumb media-thumb-video">
           <video preload="metadata" controls playsinline>
-            <source src="{{ item.file.url }}" type="video/mp4">
+            <source src="{{ item.get_url }}" type="video/mp4">
           </video>
           <div class="video-badge">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           </div>
           {% if item.caption %}<p class="video-caption">{{ item.caption }}</p>{% endif %}
-          <div class="media-download-btn" onclick="event.stopPropagation(); downloadMedia('{{ item.file.url }}', '{{ item.file.name|escapejs }}')" title="Download">
+          <div class="media-download-btn" onclick="event.stopPropagation(); downloadMedia('{{ item.get_url }}', '{{ item.file.name|escapejs }}')" title="Download">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </div>
-          <div class="media-share-btn" onclick="copyLink('{{ request.scheme }}://{{ request.get_host }}{{ item.file.url }}')" title="Copy link">
+          <div class="media-share-btn" onclick="copyLink('{{ request.scheme }}://{{ request.get_host }}{{ item.get_url }}')" title="Copy link">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
           </div>
         </div>
@@ -129,7 +129,7 @@
 const mediaItems = [
   {% for item in media_items %}
   {% if item.media_type == 'image' %}
-  { src: "{{ item.file.url }}", caption: "{{ item.caption|escapejs }}", index: {{ forloop.counter0 }} },
+  { src: "{{ item.get_url }}", caption: "{{ item.caption|escapejs }}", index: {{ forloop.counter0 }} },
   {% endif %}
   {% endfor %}
 ];

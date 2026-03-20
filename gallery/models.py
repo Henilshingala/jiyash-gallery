@@ -26,10 +26,14 @@ class Section(models.Model):
 
     def get_cover(self):
         if self.cover_image:
-            return self.cover_image.url
+            url = self.cover_image.url
+            if 'image/upload' in url:
+                # Sections covers are always images, but just in case
+                return url
+            return url
         first_image = self.media.filter(media_type='image').first()
         if first_image:
-            return first_image.file.url
+            return first_image.get_url
         return None
 
 
@@ -44,6 +48,15 @@ class MediaItem(models.Model):
 
     class Meta:
         ordering = ['order', '-uploaded_at']
+
+    @property
+    def get_url(self):
+        if not self.file:
+            return ""
+        url = self.file.url
+        if self.media_type == 'video' and 'image/upload' in url:
+            return url.replace('image/upload', 'video/upload')
+        return url
 
     def __str__(self):
         return f"{self.media_type} - {self.caption or self.file.name}"

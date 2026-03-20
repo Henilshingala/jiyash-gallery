@@ -66,11 +66,11 @@
       <input type="checkbox" class="bulk-checkbox" value="{{ item.pk }}" onchange="toggleSelection()">
       <div class="admin-media-thumb">
         {% if item.media_type == 'image' %}
-          <img src="{{ item.file.url }}" alt="{{ item.caption }}" loading="lazy">
+          <img src="{{ item.get_url }}" alt="{{ item.caption }}" loading="lazy">
           <div class="admin-media-type image-tag">IMG</div>
         {% else %}
           <video preload="metadata" muted>
-            <source src="{{ item.file.url }}" type="video/mp4">
+            <source src="{{ item.get_url }}" type="video/mp4">
           </video>
           <div class="admin-media-type video-tag">VID</div>
         {% endif %}

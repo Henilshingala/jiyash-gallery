@@ -12,9 +12,9 @@
   <div class="form-card" style="max-width:600px">
     <div class="media-preview-edit">
       {% if item.media_type == 'image' %}
-      <img src="{{ item.file.url }}" alt="{{ item.caption }}">
+      <img src="{{ item.get_url }}" alt="{{ item.caption }}">
       {% else %}
-      <video src="{{ item.file.url }}" controls style="width:100%;border-radius:8px"></video>
+      <video src="{{ item.get_url }}" controls style="width:100%;border-radius:8px"></video>
       {% endif %}
     </div>
 
