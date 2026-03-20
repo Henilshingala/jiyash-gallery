@@ -1,12 +1,12 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════
-#  LUMINARY GALLERY — One-command Setup Script
+#  JIYA & SHAILESH GALLERY — One-command Setup Script
 # ═══════════════════════════════════════════════════
 
 set -e
 
 echo ""
-echo "◈  LUMINARY GALLERY — Setup"
+echo " ✨  JIYA & SHAILESH GALLERY — Setup"
 echo "─────────────────────────────────────────────"
 
 # 1. Create virtual environment
