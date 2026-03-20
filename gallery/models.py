@@ -51,6 +51,7 @@ class MediaItem(models.Model):
             models.Case(
                 models.When(order=0, then=models.Value(999999)),
                 default=models.F('order'),
+                output_field=models.PositiveIntegerField(),
             ),
             '-uploaded_at'
         ]
