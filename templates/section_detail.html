@@ -59,7 +59,7 @@
 
         {% if item.media_type == 'image' %}
         <div class="media-thumb" onclick="openLightbox({{ forloop.counter0 }})">
-          <img src="{{ item.get_url }}" alt="{{ item.caption }}" loading="lazy">
+          <img src="{{ item.get_url }}" alt="{{ item.caption }}" {% if forloop.counter > 12 %}loading="lazy"{% endif %}>
           <div class="media-overlay">
             <span class="media-zoom">⊕</span>
             {% if item.caption %}<p class="media-caption-hover">{{ item.caption }}</p>{% endif %}
@@ -76,7 +76,7 @@
 
         {% else %}
         <div class="media-thumb media-thumb-video">
-          <video preload="metadata" controls playsinline>
+          <video preload="auto" controls playsinline>
             <source src="{{ item.get_url }}" type="video/mp4">
           </video>
           <div class="video-badge">
@@ -156,6 +156,16 @@ function showLb() {
 function lbNav(dir) {
   lbIndex = (lbIndex + dir + imageOnlyItems.length) % imageOnlyItems.length;
   showLb();
+  preloadNext(); // Preload ahead
+}
+
+function preloadNext() {
+  const next = (lbIndex + 1) % imageOnlyItems.length;
+  const prev = (lbIndex - 1 + imageOnlyItems.length) % imageOnlyItems.length;
+  [next, prev].forEach(idx => {
+    const img = new Image();
+    img.src = imageOnlyItems[idx].src;
+  });
 }
 
 function closeLightbox() {
@@ -168,6 +178,26 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') lbNav(-1);
   if (e.key === 'ArrowRight') lbNav(1);
 });
+
+// Swipe support
+let touchStartX = 0;
+let touchEndX = 0;
+const lb = document.getElementById('lightbox');
+
+lb.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+}, {passive: true});
+
+lb.addEventListener('touchend', e => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleGesture();
+}, {passive: true});
+
+function handleGesture() {
+  const threshold = 50;
+  if (touchEndX < touchStartX - threshold) lbNav(1);  // Swipe left
+  if (touchEndX > touchStartX + threshold) lbNav(-1); // Swipe right
+}
 
 function copyLink(url) {
   navigator.clipboard.writeText(url).then(() => {
