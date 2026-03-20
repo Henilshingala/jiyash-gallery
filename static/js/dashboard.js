@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   LUMINARY GALLERY — Dashboard JavaScript
+   JIYA & SHAILESH GALLERY — Dashboard JavaScript
 ═══════════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
