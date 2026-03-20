@@ -1,4 +1,4 @@
-# ◈ Luminary Gallery
+# JIYA & SHAILESH Gallery
 
 A personal media gallery and video sharing website built with Django.
 
