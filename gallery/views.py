@@ -113,12 +113,9 @@ def section_edit(request, pk):
 @require_POST
 def section_delete(request, pk):
     section = get_object_or_404(Section, pk=pk)
-    # Delete associated media files
-    for item in section.media.all():
-        if item.file and os.path.exists(item.file.path):
-            os.remove(item.file.path)
-    if section.cover_image and os.path.exists(section.cover_image.path):
-        os.remove(section.cover_image.path)
+    # Associated media will be handled by the database delete.
+    # Remote storage deletion is handled by django-cloudinary-storage if configured,
+    # or manually via script. Removing local path checks for cloud compatibility.
     section.delete()
     messages.success(request, 'Section deleted.')
     return redirect('dashboard_sections')
@@ -156,8 +153,6 @@ def media_bulk_delete(request):
         ids = data.get('ids', [])
         deleted = 0
         for item in MediaItem.objects.filter(pk__in=ids):
-            if item.file and os.path.exists(item.file.path):
-                os.remove(item.file.path)
             item.delete()
             deleted += 1
         return JsonResponse({'status': 'ok', 'deleted': deleted})
@@ -207,8 +202,6 @@ def media_upload(request, pk):
 def media_delete(request, pk):
     item = get_object_or_404(MediaItem, pk=pk)
     section_pk = item.section.pk
-    if item.file and os.path.exists(item.file.path):
-        os.remove(item.file.path)
     item.delete()
     messages.success(request, 'Media deleted.')
     return redirect('media_upload', pk=section_pk)
