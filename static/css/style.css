@@ -449,6 +449,32 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 400; line-he
 /* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   RESPONSIVE & LAYOUT TWEAKS
+   ══════════════════════════════════════════ */
+
+/* Video Full-Width & Centering */
+.media-item[data-type="video"] {
+  grid-column: 1 / -1;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 0;
+  width: 100%;
+}
+
+.media-item[data-type="video"] .media-thumb {
+  width: 100%;
+  max-width: 960px; /* Cinematic width */
+  aspect-ratio: 16/9;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border2);
+}
+
+.media-item[data-type="video"] video {
+  object-fit: cover !important; /* Fill the cinematic frame */
+}
+
 @media (max-width: 768px) {
   .sections-grid { grid-template-columns: 1fr; }
   .media-grid { grid-template-columns: repeat(2, 1fr); }
@@ -457,8 +483,15 @@ h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 400; line-he
   .lb-prev { left: 0.75rem; }
   .lb-next { right: 0.75rem; }
 }
+
 @media (max-width: 480px) {
   .container { padding: 0 1rem; }
   .media-grid { grid-template-columns: 1fr; }
   .hero-title { font-size: 2.8rem; }
+  
+  .media-item[data-type="video"] .media-thumb {
+    max-width: 100%;
+    aspect-ratio: 16/9;
+  }
 }
+

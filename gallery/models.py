@@ -47,7 +47,13 @@ class MediaItem(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['order', '-uploaded_at']
+        ordering = [
+            models.Case(
+                models.When(order=0, then=models.Value(999999)),
+                default=models.F('order'),
+            ),
+            '-uploaded_at'
+        ]
 
     @property
     def get_url(self):
