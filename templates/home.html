@@ -32,7 +32,8 @@
         <a href="{% url 'section_detail' section.pk %}" class="card-link">
           <div class="card-thumb">
             {% if section.get_cover %}
-              <img src="{{ section.get_cover }}" alt="{{ section.name }}" loading="lazy">
+              <img src="{{ section.get_cover }}" alt="{{ section.name }}" loading="lazy"
+                   onerror="this.parentElement.style.display='none'">
             {% else %}
               <div class="card-thumb-placeholder">
                 <span>◈</span>
